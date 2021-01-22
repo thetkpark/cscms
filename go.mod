@@ -1,4 +1,4 @@
-module github.com/thetkpark/cscms-cli
+module github.com/thetkpark/cscms
 
 go 1.15
 

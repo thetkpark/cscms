@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 package main
 
-import "github.com/thetkpark/cscms-cli/cmd"
+import "github.com/thetkpark/cscms/cmd"
 
 func main() {
 	cmd.Execute()
