@@ -25,12 +25,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type fullUrlRespBody struct {
-	ShortenURL string `json:"shortenUrl"`
-	URL        string `json:"url"`
-	Visit      int64  `json:"visit"`
-}
-
 // akaCmd represents the aka command
 var akaCmd = &cobra.Command{
 	Use:   "aka",

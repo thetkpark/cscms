@@ -73,6 +73,11 @@ func init() {
 	akaCmd.AddCommand(akaGetCmd)
 }
 
+type fullUrlRespBody struct {
+	ShortenURL string `json:"shortenUrl"`
+	URL        string `json:"url"`
+	Visit      int64  `json:"visit"`
+}
 
 func displayURL (resp *http.Response) {
 	defer resp.Body.Close()
