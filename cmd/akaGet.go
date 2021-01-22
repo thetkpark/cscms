@@ -27,22 +27,18 @@ import (
 	"github.com/pkg/browser"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"regexp"
 
 	"github.com/spf13/cobra"
 )
-func er(msg interface{}) {
-	fmt.Println("Error:", msg)
-	os.Exit(1)
-}
+
 // akaGetCmd represents the akaGet command
 var openBrowser bool
 var browserOnly bool
 var akaGetCmd = &cobra.Command{
 	Use:   "get <shorten url>",
-	Short: "Get the detail of URL from shorten URL",
-	Long: `Get the detail of URL from shorten URL`,
+	Short: "Get the original URL from shorten URL",
+	Long: `Get the original of URL from shorten URL`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		shortenURL := args[0]
@@ -54,9 +50,20 @@ var akaGetCmd = &cobra.Command{
 		}
 		resp, err := http.Get("https://aka.cscms.me/api/originalUrl?url=" + shortenURL)
 		if err != nil {
-			panic("API Error")
+			er("Cannot connect to aka.cscms.me. Please check your internet connection")
 		}
-		displayURL(resp)
+		if resp.StatusCode == 200 {
+			displayURL(resp)
+		} else {
+			switch resp.StatusCode {
+			case 400:
+				er("The URL input is not valid")
+			case 404:
+				er("Original URL not found.")
+			case 500:
+				er("API Server Error")
+			}
+		}
 	},
 }
 
@@ -71,12 +78,12 @@ func displayURL (resp *http.Response) {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		panic("Body reading error")
+		er("Cannot read response body from API calling")
 	}
 	var fullUrlData fullUrlRespBody
 	err = json.Unmarshal(body, &fullUrlData)
 	if err != nil {
-		panic("JSON reading error")
+		er("Cannot parse JSON into struct")
 	}
 	if browserOnly || openBrowser {
 		browser.OpenURL(fullUrlData.URL)
