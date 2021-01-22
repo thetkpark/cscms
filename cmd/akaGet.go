@@ -1,33 +1,13 @@
-/*
-Copyright © 2021 Sethanant Pipatpakorn <sethanant.p@icloud.com>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
 package cmd
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/browser"
 	"io/ioutil"
 	"net/http"
 	"regexp"
+
+	"github.com/pkg/browser"
 
 	"github.com/spf13/cobra"
 )
@@ -43,8 +23,8 @@ var akaGetCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		shortenURL := args[0]
 		fullURLRegex := regexp.MustCompile("(.*aka.cscms.me/)(.+)")
-		matchFullUrl := fullURLRegex.MatchString(args[0])
-		if matchFullUrl {
+		matchFullURL := fullURLRegex.MatchString(args[0])
+		if matchFullURL {
 			url := fullURLRegex.FindStringSubmatch(args[0])
 			shortenURL = url[2]
 		}
@@ -73,7 +53,7 @@ func init() {
 	akaCmd.AddCommand(akaGetCmd)
 }
 
-type fullUrlRespBody struct {
+type fullURLRespBody struct {
 	ShortenURL string `json:"shortenUrl"`
 	URL        string `json:"url"`
 	Visit      int64  `json:"visit"`
@@ -85,18 +65,18 @@ func displayURL (resp *http.Response) {
 	if err != nil {
 		er("Cannot read response body from API calling")
 	}
-	var fullUrlData fullUrlRespBody
-	err = json.Unmarshal(body, &fullUrlData)
+	var fullURLData fullURLRespBody
+	err = json.Unmarshal(body, &fullURLData)
 	if err != nil {
 		er("Cannot parse JSON into struct")
 	}
 	if browserOnly || openBrowser {
-		browser.OpenURL(fullUrlData.URL)
+		browser.OpenURL(fullURLData.URL)
 	}
 	if !browserOnly {
-		fmt.Printf("Full URL: %s\n", fullUrlData.URL)
-		fmt.Printf("Shorten URL: %s\n", "https://aka.cscms.me/"+fullUrlData.ShortenURL)
-		fmt.Printf("Visited: %d\n", fullUrlData.Visit)
+		fmt.Printf("Full URL: %s\n", fullURLData.URL)
+		fmt.Printf("Shorten URL: %s\n", "https://aka.cscms.me/"+fullURLData.ShortenURL)
+		fmt.Printf("Visited: %d\n", fullURLData.Visit)
 	}
 
 }
