@@ -33,8 +33,8 @@ import (
 )
 
 // akaGetCmd represents the akaGet command
-var openBrowser bool
-var browserOnly bool
+var openBrowser, browserOnly bool
+
 var akaGetCmd = &cobra.Command{
 	Use:   "get <shorten url>",
 	Short: "Get the original URL from shorten URL",
