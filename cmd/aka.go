@@ -22,10 +22,19 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
-
 	"github.com/spf13/cobra"
+	"io/ioutil"
+	"net/http"
+	"regexp"
 )
+
+type fullUrlRespBody struct {
+	ShortenURL string `json:"shortenUrl"`
+	URL        string `json:"url"`
+	Visit      int64  `json:"visit"`
+}
 
 // akaCmd represents the aka command
 var akaCmd = &cobra.Command{
@@ -33,7 +42,30 @@ var akaCmd = &cobra.Command{
 	Short: "Interact with URL shortener service at aka.cscms.me",
 	Long: `Interact with URL shortener service at aka.cscms.me`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("aka called")
+		if args[0] == "get" {
+			shortenURL := args[1]
+			fullURLRegex := regexp.MustCompile("(.*aka.cscms.me/)(.+)")
+			matchFullUrl := fullURLRegex.MatchString(args[1])
+			if matchFullUrl {
+				url := fullURLRegex.FindStringSubmatch(args[1])
+				shortenURL = url[2]
+			}
+			resp, err := http.Get("https://aka.cscms.me/api/originalUrl?url=" + shortenURL)
+			if err != nil {
+				panic("API Error")
+			}
+			defer resp.Body.Close()
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				panic("Body reading error")
+			}
+			var fullUrlData fullUrlRespBody
+			json.Unmarshal(body, &fullUrlData)
+			fmt.Printf("Full URL: %s\n", fullUrlData.URL)
+			fmt.Printf("Shorten URL: %s\n", "https://aka.cscms.me/"+fullUrlData.ShortenURL)
+			fmt.Printf("Visited: %d\n", fullUrlData.Visit)
+			//browser.OpenURL(fullUrlData.URL)
+		}
 	},
 }
 
