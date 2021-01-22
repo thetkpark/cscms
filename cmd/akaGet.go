@@ -18,8 +18,8 @@ var openBrowser, browserOnly bool
 var akaGetCmd = &cobra.Command{
 	Use:   "get <shorten url>",
 	Short: "Get the original URL from shorten URL",
-	Long: `Get the original of URL from shorten URL`,
-	Args: cobra.ExactArgs(1),
+	Long:  `Get the original of URL from shorten URL`,
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		shortenURL := args[0]
 		fullURLRegex := regexp.MustCompile("(.*aka.cscms.me/)(.+)")
@@ -48,8 +48,8 @@ var akaGetCmd = &cobra.Command{
 }
 
 func init() {
-	akaGetCmd.Flags().BoolVarP(&openBrowser,"open-browser", "b", false, "Open the full url using your default web browser")
-	akaGetCmd.Flags().BoolVarP(&browserOnly,"open-only", "o", false, "Open the website of full URL in you default web browser without showing detail about the URL")
+	akaGetCmd.Flags().BoolVarP(&openBrowser, "open-browser", "b", false, "Open the full url using your default web browser")
+	akaGetCmd.Flags().BoolVarP(&browserOnly, "open-only", "o", false, "Open the website of full URL in you default web browser without showing detail about the URL")
 	akaCmd.AddCommand(akaGetCmd)
 }
 
@@ -59,7 +59,7 @@ type fullURLRespBody struct {
 	Visit      int64  `json:"visit"`
 }
 
-func displayURL (resp *http.Response) {
+func displayURL(resp *http.Response) {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

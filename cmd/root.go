@@ -16,7 +16,7 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "cscms",
 	Short: "A CLI that lets you interact with services of cscms.me",
-	Long: `A CLI that lets you interact with services of cscms.me such as URL shortener`,
+	Long:  `A CLI that lets you interact with services of cscms.me such as URL shortener`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },

@@ -24,9 +24,9 @@ var prefer string
 var long bool
 var akaCreateCmd = &cobra.Command{
 	Use:   "create <url>",
-	Args: cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(1),
 	Short: "Create a shorten URL",
-	Long: "Create a shorten URL from aka.cscms.me",
+	Long:  "Create a shorten URL from aka.cscms.me",
 	Run: func(cmd *cobra.Command, args []string) {
 		reqBodyMap := map[string]string{
 			"url": args[0],
