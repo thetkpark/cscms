@@ -34,6 +34,11 @@ type shortenURLRespBody struct {
 	ShortUrl string `json:"shortUrl"`
 }
 
+type shortenURLErrorBody struct {
+	Error   string `json:"error"`
+	Success bool   `json:"success"`
+}
+
 // createCmd represents the create command
 var prefer string
 var long bool
@@ -58,17 +63,28 @@ var akaCreateCmd = &cobra.Command{
 		if err != nil {
 			er("Cannot connect to aka.cscms.me API server")
 		}
-		defer resp.Body.Close()
-		var respBody shortenURLRespBody
 		body, err := ioutil.ReadAll(resp.Body)
-		err = json.Unmarshal(body, &respBody)
-		if err != nil {
-			er("Cannot parse JSON response")
+		if resp.StatusCode == 201 {
+			defer resp.Body.Close()
+			var respBody shortenURLRespBody
+			err = json.Unmarshal(body, &respBody)
+			if err != nil {
+				er("Cannot parse JSON response")
+			}
+			if long {
+				fmt.Printf("Original URL: %s\n", args[0])
+			}
+			fmt.Printf("Shorten URL: https://aka.cscms.me/%s", respBody.ShortUrl)
+		} else if resp.StatusCode == 400 {
+			var respErrorBody shortenURLErrorBody
+			err = json.Unmarshal(body, &respErrorBody)
+			if err != nil {
+				er("Cannot parse JSON Error response")
+			}
+			er(respErrorBody.Error)
+		} else {
+			er("API Server Error")
 		}
-		if long {
-			fmt.Printf("Original URL: %s\n", args[0])
-		}
-		fmt.Printf("Shorten URL: https://aka.cscms.me/%s", respBody.ShortUrl)
 	},
 }
 
