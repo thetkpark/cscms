@@ -22,12 +22,7 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/spf13/cobra"
-	"io/ioutil"
-	"net/http"
-	"regexp"
 )
 
 type fullUrlRespBody struct {
@@ -41,44 +36,19 @@ var akaCmd = &cobra.Command{
 	Use:   "aka",
 	Short: "Interact with URL shortener service at aka.cscms.me",
 	Long: `Interact with URL shortener service at aka.cscms.me`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if args[0] == "get" {
-			shortenURL := args[1]
-			fullURLRegex := regexp.MustCompile("(.*aka.cscms.me/)(.+)")
-			matchFullUrl := fullURLRegex.MatchString(args[1])
-			if matchFullUrl {
-				url := fullURLRegex.FindStringSubmatch(args[1])
-				shortenURL = url[2]
-			}
-			resp, err := http.Get("https://aka.cscms.me/api/originalUrl?url=" + shortenURL)
-			if err != nil {
-				panic("API Error")
-			}
-			defer resp.Body.Close()
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				panic("Body reading error")
-			}
-			var fullUrlData fullUrlRespBody
-			json.Unmarshal(body, &fullUrlData)
-			fmt.Printf("Full URL: %s\n", fullUrlData.URL)
-			fmt.Printf("Shorten URL: %s\n", "https://aka.cscms.me/"+fullUrlData.ShortenURL)
-			fmt.Printf("Visited: %d\n", fullUrlData.Visit)
-			//browser.OpenURL(fullUrlData.URL)
-		}
-	},
+	//Run: func(cmd *cobra.Command, args []string) {
+	//},
 }
+
+
+
+
+
+
 
 func init() {
 	rootCmd.AddCommand(akaCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// akaCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// akaCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
+
+
