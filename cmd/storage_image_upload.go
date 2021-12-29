@@ -39,17 +39,20 @@ var storageImageUploadCmd = &cobra.Command{
 			fmt.Println("Error opening the file")
 			return
 		}
+		defer file.Close()
 
 		// Check if fileInfo is valid
 		fileInfo, err := file.Stat()
 		if err != nil {
 			return
 		}
+		// Check file size
 		if fileInfo.Size() > 5<<20 {
 			fmt.Println("the limited image size is 5MB")
 			return
 		}
 
+		// Check file content type
 		mimeType, err := getFileContentType(file)
 		if err != nil {
 			return
@@ -67,7 +70,7 @@ var storageImageUploadCmd = &cobra.Command{
 			SetResult(&result).
 			Post("https://storage.cscms.me/api/image")
 		if err != nil {
-			fmt.Println("Error sending request")
+			fmt.Println("Error uploading image to server. Please check your internet connection")
 			return
 		}
 
