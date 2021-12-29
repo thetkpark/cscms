@@ -79,7 +79,7 @@ var storageImageUploadCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Printf("\nYou image is avaliable at: https://img.cscms.me/%s", result.FilePath)
+		fmt.Printf("\nYou image is avaliable at https://img.cscms.me/%s", result.FilePath)
 	},
 }
 
