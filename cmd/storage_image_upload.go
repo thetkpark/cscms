@@ -26,60 +26,63 @@ var storageImageUploadCmd = &cobra.Command{
 	Long:      "Upload image to storage",
 	ValidArgs: []string{"image file"},
 	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) != 1 {
-			return fmt.Errorf("select one image file to upload")
+		if len(args) < 1 {
+			return fmt.Errorf("select one or more image file(s) to upload")
 		}
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		// Check api key
 		apiKey := viper.GetString("apiKey")
-		file, err := os.Open(args[0])
-		if err != nil {
-			fmt.Println("Error opening the file")
-			return
-		}
-		defer file.Close()
 
-		// Check if fileInfo is valid
-		fileInfo, err := file.Stat()
-		if err != nil {
-			return
-		}
-		// Check file size
-		if fileInfo.Size() > 5<<20 {
-			fmt.Println("the limited image size is 5MB")
-			return
-		}
+		for _, imagePath := range args {
+			file, err := os.Open(imagePath)
+			if err != nil {
+				fmt.Println("Error opening the file")
+				return
+			}
+			defer file.Close()
 
-		// Check file content type
-		mimeType, err := getFileContentType(file)
-		if err != nil {
-			return
-		}
-		if !isSupportedMimeType(mimeType) {
-			fmt.Printf("\n%s is not supported", mimeType)
-			return
-		}
+			// Check if fileInfo is valid
+			fileInfo, err := file.Stat()
+			if err != nil {
+				return
+			}
+			// Check file size
+			if fileInfo.Size() > 5<<20 {
+				fmt.Println("the limited image size is 5MB")
+				return
+			}
 
-		// Sending HTTP request to api server
-		result := Image{}
-		client := resty.New()
-		res, err := client.R().SetFile("image", args[0]).
-			SetHeader("x-api-key", apiKey).
-			SetResult(&result).
-			Post("https://storage.cscms.me/api/image")
-		if err != nil {
-			fmt.Println("Error uploading image to server. Please check your internet connection")
-			return
-		}
+			// Check file content type
+			mimeType, err := getFileContentType(file)
+			if err != nil {
+				return
+			}
+			if !isSupportedMimeType(mimeType) {
+				fmt.Printf("\n%s is not supported", mimeType)
+				return
+			}
 
-		if res.IsError() {
-			fmt.Printf("\nThere is an error with code %d", res.StatusCode())
-			return
-		}
+			// Sending HTTP request to api server
+			result := Image{}
+			client := resty.New()
+			res, err := client.R().SetFile("image", imagePath).
+				SetHeader("x-api-key", apiKey).
+				SetResult(&result).
+				Post("https://storage.cscms.me/api/image")
+			if err != nil {
+				fmt.Println("Error uploading image to server. Please check your internet connection")
+				return
+			}
 
-		fmt.Printf("https://img.cscms.me/%s", result.FilePath)
+			if res.IsError() {
+				fmt.Printf("\nThere is an error with code %d", res.StatusCode())
+				return
+			}
+
+			fmt.Printf("https://img.cscms.me/%s\n", result.FilePath)
+		}
 	},
 }
 
