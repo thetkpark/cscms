@@ -33,12 +33,11 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cscms.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cscms.yaml)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -60,13 +59,22 @@ func initConfig() {
 
 		// Search config in home directory with name ".cscms" (without extension).
 		viper.AddConfigPath(home)
+		viper.SetConfigType("yaml")
 		viper.SetConfigName(".cscms")
+		//_ = viper.WriteConfig()
+
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			//fmt.Printf("Config file not found: %s\n", viper.ConfigFileUsed())
+			viper.SafeWriteConfig()
+		} else {
+			fmt.Println("Error loading config file")
+		}
 	}
+	//fmt.Println("Using config file:", viper.ConfigFileUsed())
 }
